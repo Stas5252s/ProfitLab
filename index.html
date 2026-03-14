@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profit Lab — Resell & Rental Calculator</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,400;0,9..144,700;1,9..144,200;1,9..144,400;1,9..144,700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* ─── TOKENS ─────────────────────────────── */
+        :root {
+            --ink: #0e0d12;
+            --paper: #f5f2ec;
+            --accent: #c8f060;
+            --accent2: #60b4f0;
+            --muted: #6b6570;
+            --border: rgba(14, 13, 18, .1);
+            --border-light: rgba(14, 13, 18, .06);
+            --surface: #ffffff;
+            --surface2: #f0ede6;
+            --mono: 'DM Mono', monospace;
+            --serif: 'Fraunces', Georgia, serif;
+            --ease: cubic-bezier(.4, 0, .2, 1);
+        }
+
+        /* ─── RESET ──────────────────────────────── */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px
+        }
+
+        body {
+            font-family: var(--mono);
+            background: var(--paper);
+            color: var(--ink);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        img {
+            display: block;
+            max-width: 100%
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none
+        }
+
+        button {
+            cursor: pointer;
+            font-family: var(--mono)
+        }
+
+        /* ─── UTILITY ────────────────────────────── */
+        .container {
+            width: 100%;
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            font-size: .65rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: .3rem .85rem;
+            font-family: var(--mono);
+            margin-bottom: 1.5rem;
+        }
+
+        .tag::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            flex-shrink: 0;
+        }
+
+        /* ─── SCROLL ANIMATIONS ──────────────────── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity .7s var(--ease), transform .7s var(--ease);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0)
+        }
+
+        .reveal-delay-1 {
+            transition-delay: .1s
+        }
+
+        .reveal-delay-2 {
+            transition-delay: .2s
+        }
+
+        .reveal-delay-3 {
+            transition-delay: .3s
+        }
+
+        .reveal-delay-4 {
+            transition-delay: .4s
+        }
+
+        /* ─── NAV ────────────────────────────────── */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            background: rgba(245, 242, 236, .88);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-light);
+            transition: box-shadow .3s;
+        }
+
+        nav.scrolled {
+            box-shadow: 0 4px 24px rgba(14, 13, 18, .08)
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .nav-brand {
+            font-family: var(--serif);
+            font-weight: 400;
+            font-size: 1.05rem;
+            letter-spacing: -.01em;
+        }
+
+        .nav-brand em {
+            font-style: italic;
+            color: var(--accent);
+            filter: brightness(.7)
+        }
+
+        .nav-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            background: var(--ink);
+            color: var(--paper);
+            font-family: var(--mono);
+            font-size: .7rem;
+            letter-spacing: .06em;
+            padding: .55rem 1.1rem;
+            border-radius: 6px;
+            border: none;
+            transition: background .18s, transform .15s;
+        }
+
+        .nav-cta:hover {
+            background: #1e1c25;
+            transform: translateY(-1px)
+        }
+
+        /* ─── HERO ───────────────────────────────── */
+        .hero {
+            padding: 140px 0 100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-grid-bg {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(var(--border-light) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border-light) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+        }
+
+        .hero-grid-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 70% 60% at 50% 0%, transparent 40%, var(--paper) 100%);
+        }
+
+        .hero-content {
+            position: relative;
+            max-width: 760px;
+        }
+
+        .hero-eyebrow {
+            font-size: .65rem;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: var(--muted);
+            font-family: var(--mono);
+            margin-bottom: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: .7rem;
+        }
+
+        .hero-eyebrow::before {
+            content: '';
+            display: inline-block;
+            width: 28px;
+            height: 1px;
+            background: var(--muted);
+        }
+
+        h1 {
+            font-family: var(--serif);
+            font-weight: 200;
+            font-size: clamp(3rem, 8vw, 6rem);
+            line-height: 1.0;
+            letter-spacing: -.03em;
+            color: var(--ink);
+            margin-bottom: 1.8rem;
+        }
+
+        h1 em {
+            font-style: italic;
+            color: transparent;
+            -webkit-text-stroke: 1.5px var(--ink);
+        }
+
+        h1 .accent-word {
+            position: relative;
+            display: inline-block;
+        }
+
+        h1 .accent-word::after {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        .hero-sub {
+            font-size: 1rem;
+            color: var(--muted);
+            max-width: 480px;
+            line-height: 1.7;
+            margin-bottom: 2.5rem;
+            font-family: var(--mono);
+            font-weight: 300;
+        }
+
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: .6rem;
+            background: var(--ink);
+            color: var(--paper);
+            font-family: var(--mono);
+            font-size: .78rem;
+            letter-spacing: .05em;
+            padding: .85rem 1.8rem;
+            border-radius: 8px;
+            border: none;
+            transition: background .18s, transform .15s, box-shadow .18s;
+            box-shadow: 0 4px 20px rgba(14, 13, 18, .18);
+        }
+
+        .btn-primary:hover {
+            background: #1e1c25;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(14, 13, 18, .22);
+        }
+
+        .btn-primary svg {
+            width: 14px;
+            height: 14px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+
+        .hero-note {
+            font-size: .68rem;
+            color: var(--muted);
+            letter-spacing: .04em;
+        }
+
+        .hero-stat-row {
+            display: flex;
+            gap: 2.5rem;
+            flex-wrap: wrap;
+            margin-top: 5rem;
+            padding-top: 2.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .hero-stat {}
+
+        .hero-stat-num {
+            font-family: var(--serif);
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -.03em;
+            line-height: 1;
+            color: var(--ink);
+        }
+
+        .hero-stat-num em {
+            font-style: italic;
+            color: transparent;
+            -webkit-text-stroke: 1px var(--ink)
+        }
+
+        .hero-stat-label {
+            font-size: .65rem;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-top: .3rem;
+        }
+
+        /* ─── PROBLEM ────────────────────────────── */
+        .problem {
+            padding: 100px 0;
+            background: var(--ink);
+            color: var(--paper);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .problem-noise {
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            opacity: .5;
+        }
+
+        .problem-inner {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .problem-label {
+            font-size: .65rem;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: rgba(245, 242, 236, .35);
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        .problem-label::before {
+            content: '';
+            width: 20px;
+            height: 1px;
+            background: rgba(245, 242, 236, .35);
+        }
+
+        h2 {
+            font-family: var(--serif);
+            font-weight: 200;
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            letter-spacing: -.025em;
+            line-height: 1.15;
+        }
+
+        h2 em {
+            font-style: italic
+        }
+
+        .problem-text h2 {
+            color: var(--paper);
+            margin-bottom: 1.4rem
+        }
+
+        .problem-text p {
+            font-size: .9rem;
+            color: rgba(245, 242, 236, .55);
+            line-height: 1.75;
+            font-weight: 300;
+        }
+
+        .pain-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .pain-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.1rem 1.4rem;
+            background: rgba(255, 255, 255, .03);
+            border: 1px solid rgba(255, 255, 255, .06);
+            border-radius: 10px;
+            font-size: .85rem;
+            color: rgba(245, 242, 236, .7);
+            font-weight: 300;
+            transition: background .18s;
+        }
+
+        .pain-list li:hover {
+            background: rgba(255, 255, 255, .06)
+        }
+
+        .pain-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 107, 107, .12);
+            border: 1px solid rgba(255, 107, 107, .2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .pain-icon svg {
+            width: 14px;
+            height: 14px;
+            fill: none;
+            stroke: #ff6b6b;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+
+        /* ─── FEATURES ───────────────────────────── */
+        .features {
+            padding: 100px 0;
+        }
+
+        .section-header {
+            margin-bottom: 4rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            padding: 2rem;
+            transition: background .18s;
+            position: relative;
+        }
+
+        .feature-card:hover {
+            background: var(--surface2)
+        }
+
+        .feature-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.4rem;
+            border: 1px solid var(--border);
+            background: var(--paper);
+        }
+
+        .feature-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: var(--ink);
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+
+        .feature-card h3 {
+            font-family: var(--serif);
+            font-weight: 400;
+            font-size: 1.05rem;
+            letter-spacing: -.01em;
+            margin-bottom: .6rem;
+            color: var(--ink);
+        }
+
+        .feature-card p {
+            font-size: .8rem;
+            color: var(--muted);
+            line-height: 1.65;
+            font-weight: 300;
+        }
+
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 2rem;
+            right: 2rem;
+            height: 2px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform .25s var(--ease);
+            border-radius: 2px;
+        }
+
+        .feature-card:hover::after {
+            transform: scaleX(1)
+        }
+
+        /* ─── PREVIEW ────────────────────────────── */
+        .preview {
+            padding: 80px 0 100px;
+            background: var(--surface2);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .preview-label {
+            font-size: .65rem;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        .preview-label::before {
+            content: '';
+            width: 20px;
+            height: 1px;
+            background: var(--muted)
+        }
+
+        .preview-headline {
+            font-family: var(--serif);
+            font-weight: 200;
+            font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+            letter-spacing: -.025em;
+            margin-bottom: 3rem;
+            color: var(--ink);
+        }
+
+        .preview-headline em {
+            font-style: italic
+        }
+
+        /* Mock UI */
+        .mock-shell {
+            background: #0e0d12;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 24px 80px rgba(14, 13, 18, .2), 0 2px 0 rgba(255, 255, 255, .06) inset;
+            border: 1px solid rgba(255, 255, 255, .07);
+        }
+
+        .mock-topbar {
+            height: 48px;
+            background: #1a1a1f;
+            border-bottom: 1px solid rgba(255, 255, 255, .06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1rem;
+        }
+
+        .mock-brand {
+            font-family: var(--serif);
+            font-size: .9rem;
+            font-weight: 300;
+            color: rgba(240, 237, 232, .8);
+        }
+
+        .mock-brand em {
+            font-style: italic;
+            color: #c8f060
+        }
+
+        .mock-topbar-right {
+            display: flex;
+            gap: .5rem
+        }
+
+        .mock-pill {
+            height: 26px;
+            padding: 0 10px;
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 13px;
+            font-size: .6rem;
+            color: rgba(255, 255, 255, .35);
+            font-family: var(--mono);
+            display: flex;
+            align-items: center;
+        }
+
+        .mock-body {
+            display: flex;
+            height: 420px;
+        }
+
+        .mock-sidebar {
+            width: 200px;
+            flex-shrink: 0;
+            background: #1a1a1f;
+            border-right: 1px solid rgba(255, 255, 255, .06);
+            padding: .75rem .5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .mock-nav-label {
+            font-size: .55rem;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .2);
+            padding: .5rem .5rem .25rem;
+            margin-top: .5rem;
+        }
+
+        .mock-nav-item {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            padding: .5rem .75rem;
+            border-radius: 6px;
+            font-size: .7rem;
+            color: rgba(255, 255, 255, .35);
+            font-family: var(--mono);
+        }
+
+        .mock-nav-item.active {
+            background: rgba(200, 240, 96, .1);
+            color: #c8f060;
+            border: 1px solid rgba(200, 240, 96, .2);
+        }
+
+        .mock-nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            flex-shrink: 0
+        }
+
+        .mock-cat-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0
+        }
+
+        .mock-content {
+            flex: 1;
+            padding: 1rem;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: .65rem;
+        }
+
+        .mock-hero-card {
+            background: rgba(200, 240, 96, .08);
+            border: 1px solid rgba(200, 240, 96, .2);
+            border-radius: 10px;
+            padding: .85rem 1rem;
+        }
+
+        .mock-hero-label {
+            font-size: .55rem;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: rgba(200, 240, 96, .5);
+            margin-bottom: .3rem;
+        }
+
+        .mock-hero-val {
+            font-family: var(--serif);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #c8f060;
+            letter-spacing: -.03em;
+            line-height: 1;
+        }
+
+        .mock-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: .5rem;
+        }
+
+        .mock-metric {
+            background: rgba(255, 255, 255, .04);
+            border-radius: 7px;
+            padding: .6rem .75rem;
+        }
+
+        .mock-m-label {
+            font-size: .52rem;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .25);
+            margin-bottom: .25rem
+        }
+
+        .mock-m-val {
+            font-size: .82rem;
+            font-weight: 500;
+            color: rgba(240, 237, 232, .8)
+        }
+
+        .mock-m-val.pos {
+            color: #c8f060
+        }
+
+        .mock-m-val.neg {
+            color: #ff6b6b
+        }
+
+        .mock-obj {
+            background: rgba(255, 255, 255, .03);
+            border: 1px solid rgba(255, 255, 255, .06);
+            border-radius: 8px;
+            padding: .65rem .85rem;
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+        }
+
+        .mock-obj-info {
+            flex: 1
+        }
+
+        .mock-obj-name {
+            font-size: .72rem;
+            color: rgba(240, 237, 232, .75);
+            font-weight: 500
+        }
+
+        .mock-obj-sub {
+            font-size: .6rem;
+            color: rgba(255, 255, 255, .25);
+            margin-top: 2px
+        }
+
+        .mock-obj-badge {
+            font-size: .65rem;
+            font-weight: 500;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: rgba(200, 240, 96, .1);
+            color: #c8f060;
+        }
+
+        .mock-obj-badge.neg {
+            background: rgba(255, 107, 107, .1);
+            color: #ff6b6b
+        }
+
+        .mock-saved-list {
+            display: flex;
+            flex-direction: column;
+            gap: .4rem;
+            margin-top: .25rem
+        }
+
+        .mock-saved-item {
+            background: rgba(255, 255, 255, .03);
+            border: 1px solid rgba(255, 255, 255, .05);
+            border-radius: 7px;
+            padding: .55rem .75rem;
+            display: flex;
+            align-items: center;
+            gap: .65rem;
+        }
+
+        .mock-saved-chip {
+            font-size: .55rem;
+            padding: 2px 7px;
+            border-radius: 5px;
+            background: rgba(96, 180, 240, .1);
+            color: #60b4f0
+        }
+
+        .mock-saved-name {
+            font-size: .7rem;
+            color: rgba(240, 237, 232, .6);
+            flex: 1
+        }
+
+        .mock-saved-date {
+            font-size: .58rem;
+            color: rgba(255, 255, 255, .2)
+        }
+
+        /* ─── BENEFITS ───────────────────────────── */
+        .benefits {
+            padding: 100px 0;
+        }
+
+        .benefits-inner {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5rem;
+            align-items: center;
+        }
+
+        .benefits-text h2 {
+            color: var(--ink);
+            margin-bottom: 1.2rem
+        }
+
+        .benefits-text p {
+            font-size: .88rem;
+            color: var(--muted);
+            line-height: 1.75;
+            font-weight: 300;
+            margin-bottom: 2.5rem
+        }
+
+        .benefit-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: .85rem
+        }
+
+        .benefit-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: .9rem;
+            font-size: .85rem;
+            color: var(--ink);
+            font-weight: 300;
+        }
+
+        .benefit-check {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .benefit-check svg {
+            width: 11px;
+            height: 11px;
+            fill: none;
+            stroke: var(--ink);
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+
+        .benefit-visual {
+            position: relative;
+        }
+
+        .benefit-card {
+            background: var(--ink);
+            border-radius: 14px;
+            padding: 1.6rem;
+            color: var(--paper);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .benefit-card::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(200, 240, 96, .06);
+        }
+
+        .benefit-card-label {
+            font-size: .6rem;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: rgba(245, 242, 236, .3);
+            margin-bottom: 1.2rem
+        }
+
+        .benefit-rows {
+            display: flex;
+            flex-direction: column;
+            gap: .7rem
+        }
+
+        .benefit-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: .75rem 1rem;
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, .06);
+            border-radius: 8px;
+        }
+
+        .benefit-row-name {
+            font-size: .78rem;
+            color: rgba(245, 242, 236, .65)
+        }
+
+        .benefit-row-val {
+            font-size: .85rem;
+            font-weight: 500;
+            color: #c8f060
+        }
+
+        .benefit-row-val.neg {
+            color: #ff6b6b
+        }
+
+        .benefit-total {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, .08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .benefit-total-label {
+            font-size: .72rem;
+            color: rgba(245, 242, 236, .4)
+        }
+
+        .benefit-total-val {
+            font-family: var(--serif);
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #c8f060;
+            letter-spacing: -.03em
+        }
+
+        /* ─── CTA ────────────────────────────────── */
+        .cta {
+            padding: 100px 0;
+            text-align: center;
+            background: var(--ink);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 400px;
+            background: radial-gradient(ellipse at center, rgba(200, 240, 96, .07) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .cta-eyebrow {
+            font-size: .65rem;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: rgba(245, 242, 236, .3);
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .6rem;
+        }
+
+        .cta-eyebrow::before,
+        .cta-eyebrow::after {
+            content: '';
+            width: 28px;
+            height: 1px;
+            background: rgba(245, 242, 236, .2);
+        }
+
+        .cta h2 {
+            color: var(--paper);
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 200;
+            margin-bottom: 1rem;
+            max-width: 540px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta h2 em {
+            font-style: italic;
+            color: #c8f060
+        }
+
+        .cta p {
+            font-size: .88rem;
+            color: rgba(245, 242, 236, .45);
+            margin-bottom: 2.5rem;
+            font-weight: 300;
+        }
+
+        .btn-accent {
+            display: inline-flex;
+            align-items: center;
+            gap: .6rem;
+            background: var(--accent);
+            color: var(--ink);
+            font-family: var(--mono);
+            font-size: .78rem;
+            letter-spacing: .05em;
+            padding: .9rem 2rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 500;
+            transition: transform .15s, box-shadow .18s, background .15s;
+            box-shadow: 0 4px 20px rgba(200, 240, 96, .25);
+        }
+
+        .btn-accent:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(200, 240, 96, .35);
+            background: #d4f570;
+        }
+
+        .btn-accent svg {
+            width: 14px;
+            height: 14px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+
+        /* ─── FOOTER ─────────────────────────────── */
+        footer {
+            background: var(--ink);
+            border-top: 1px solid rgba(255, 255, 255, .06);
+            padding: 2rem 0;
+        }
+
+        .footer-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-brand {
+            font-family: var(--serif);
+            font-weight: 300;
+            font-size: .9rem;
+            color: rgba(245, 242, 236, .4);
+        }
+
+        .footer-brand em {
+            font-style: italic;
+            color: rgba(200, 240, 96, .6)
+        }
+
+        .footer-note {
+            font-size: .65rem;
+            color: rgba(245, 242, 236, .2);
+            letter-spacing: .04em
+        }
+
+        /* ─── RESPONSIVE ─────────────────────────── */
+        @media(max-width:768px) {
+            .problem-inner {
+                grid-template-columns: 1fr
+            }
+
+            .benefits-inner {
+                grid-template-columns: 1fr
+            }
+
+            .benefit-visual {
+                display: none
+            }
+
+            .mock-sidebar {
+                display: none
+            }
+
+            .mock-body {
+                height: auto
+            }
+
+            .mock-content {
+                padding: .75rem
+            }
+
+            h1 {
+                font-size: clamp(2.6rem, 10vw, 4rem)
+            }
+
+            .hero {
+                padding: 110px 0 70px
+            }
+
+            .hero-stat-row {
+                gap: 1.5rem
+            }
+        }
+
+        @media(max-width:480px) {
+            .feature-grid {
+                grid-template-columns: 1fr
+            }
+
+            .mock-metrics {
+                grid-template-columns: 1fr 1fr
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <nav id="nav">
+        <div class="container">
+            <div class="nav-inner">
+                <span class="nav-brand">Profit <em>Lab</em></span>
+                <a href="app.html" class="nav-cta">
+                    Open Calculator
+                    <svg viewBox="0 0 24 24">
+                        <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-grid-bg"></div>
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-eyebrow reveal">Resell & Rental Calculator</div>
+                <h1 class="reveal reveal-delay-1">
+                    Know your <span class="accent-word">profit</span><br>
+                    <em>before</em> you move.
+                </h1>
+                <p class="hero-sub reveal reveal-delay-2">
+                    Calculate resell profit, rental income, organize deals by categories, and export your data — all in
+                    one place.
+                </p>
+                <div class="hero-actions reveal reveal-delay-3">
+                    <a href="app.html" class="btn-primary">
+                        Start Calculating
+                        <svg viewBox="0 0 24 24">
+                            <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                    </a>
+                    <span class="hero-note">Free · No signup required</span>
+                </div>
+                <div class="hero-stat-row reveal reveal-delay-4">
+                    <div class="hero-stat">
+                        <div class="hero-stat-num">2<em>×</em></div>
+                        <div class="hero-stat-label">Calculators</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-num">∞</div>
+                        <div class="hero-stat-label">Saved deals</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-num">3</div>
+                        <div class="hero-stat-label">Languages</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-num">0<em>$</em></div>
+                        <div class="hero-stat-label">Cost</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROBLEM -->
+    <section class="problem">
+        <div class="problem-noise"></div>
+        <div class="container">
+            <div class="problem-inner">
+                <div class="problem-text reveal">
+                    <div class="problem-label">The problem</div>
+                    <h2>Most resellers <em>guess</em> their profit.</h2>
+                    <p style="margin-top:1.2rem">
+                        Spreadsheets break. Mental math is slow. Rental ROI requires formulas nobody remembers. You end
+                        up making decisions on incomplete numbers — and leaving money on the table.
+                    </p>
+                </div>
+                <ul class="pain-list reveal reveal-delay-2">
+                    <li>
+                        <div class="pain-icon"><svg viewBox="0 0 24 24">
+                                <line x1="12" y1="8" x2="12" y2="12" />
+                                <line x1="12" y1="16" x2="12.01" y2="16" />
+                                <circle cx="12" cy="12" r="10" />
+                            </svg></div>
+                        Manual calculations — slow, error-prone, and forgotten by tomorrow
+                    </li>
+                    <li>
+                        <div class="pain-icon"><svg viewBox="0 0 24 24">
+                                <path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z" />
+                                <polyline points="13 2 13 9 20 9" />
+                            </svg></div>
+                        No deal history — you can't compare what worked and what didn't
+                    </li>
+                    <li>
+                        <div class="pain-icon"><svg viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+                            </svg></div>
+                        Rental income ROI requires formulas most people don't have memorized
+                    </li>
+                    <li>
+                        <div class="pain-icon"><svg viewBox="0 0 24 24">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                            </svg></div>
+                        No categories or structure — every deal lives in a different place
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features">
+        <div class="container">
+            <div class="section-header">
+                <div class="tag">Features</div>
+                <h2 class="reveal" style="color:var(--ink);font-size:clamp(1.8rem,4vw,2.6rem)">
+                    Everything you need,<br><em>nothing you don't.</em>
+                </h2>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card reveal">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path
+                                d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                        </svg>
+                    </div>
+                    <h3>Profit Calculator</h3>
+                    <p>Instantly calculate profit from reselling items — purchase price, delivery, commission, quantity.
+                        See margin and total in real time.</p>
+                </div>
+                <div class="feature-card reveal reveal-delay-1">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" />
+                            <line x1="7" y1="7" x2="7.01" y2="7" />
+                        </svg>
+                    </div>
+                    <h3>Deal Tracking & Categories</h3>
+                    <p>Save and organize your deals by color-coded categories. Filter, rename, and recall any
+                        calculation — your deal history, always at hand.</p>
+                </div>
+                <div class="feature-card reveal reveal-delay-2">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                            <polyline points="9 22 9 12 15 12 15 22" />
+                        </svg>
+                    </div>
+                    <h3>Rent ROI Calculator</h3>
+                    <p>Analyze rental income, factor in vacancy and expenses, and calculate monthly net and full-period
+                        ROI — automatically, with payback period included.</p>
+                </div>
+                <div class="feature-card reveal reveal-delay-3">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <polyline points="8 17 12 21 16 17" />
+                            <line x1="12" y1="12" x2="12" y2="21" />
+                            <path d="M20.88 18.09A5 5 0 0018 9h-1.26A8 8 0 103 16.29" />
+                        </svg>
+                    </div>
+                    <h3>Data Export</h3>
+                    <p>Export all your calculations as JSON — easy backup, spreadsheet import, or analysis. Your data
+                        stays yours, always portable.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PREVIEW -->
+    <section class="preview">
+        <div class="container">
+            <div class="preview-label reveal">Product preview</div>
+            <h2 class="preview-headline reveal reveal-delay-1">
+                A calculator that <em>thinks</em><br>like a reseller.
+            </h2>
+            <div class="mock-shell reveal reveal-delay-2">
+                <div class="mock-topbar">
+                    <span class="mock-brand">Profit <em>Lab</em></span>
+                    <div class="mock-topbar-right">
+                        <div class="mock-pill">Dark</div>
+                        <div class="mock-pill">Export</div>
+                        <div class="mock-pill">EN</div>
+                    </div>
+                </div>
+                <div class="mock-body">
+                    <div class="mock-sidebar">
+                        <div class="mock-nav-label">Calculators</div>
+                        <div class="mock-nav-item active">
+                            <div class="mock-nav-dot"></div>Resale
+                        </div>
+                        <div class="mock-nav-item">
+                            <div class="mock-nav-dot"></div>Rental
+                        </div>
+                        <div class="mock-nav-item">
+                            <div class="mock-nav-dot"></div>Saved
+                        </div>
+                        <div class="mock-nav-item">
+                            <div class="mock-nav-dot"></div>Tags
+                        </div>
+                        <div class="mock-nav-label">Categories</div>
+                        <div class="mock-nav-item" style="gap:.5rem">
+                            <div class="mock-cat-dot" style="background:#c8f060"></div>Electronics
+                        </div>
+                        <div class="mock-nav-item" style="gap:.5rem">
+                            <div class="mock-cat-dot" style="background:#60b4f0"></div>Clothing
+                        </div>
+                        <div class="mock-nav-item" style="gap:.5rem">
+                            <div class="mock-cat-dot" style="background:#ffbb45"></div>Furniture
+                        </div>
+                    </div>
+                    <div class="mock-content">
+                        <div class="mock-hero-card">
+                            <div class="mock-hero-label">Total Profit</div>
+                            <div class="mock-hero-val">+$1,842.00</div>
+                        </div>
+                        <div class="mock-metrics">
+                            <div class="mock-metric">
+                                <div class="mock-m-label">Revenue</div>
+                                <div class="mock-m-val">$6,440</div>
+                            </div>
+                            <div class="mock-metric">
+                                <div class="mock-m-label">Avg Margin</div>
+                                <div class="mock-m-val pos">28.6%</div>
+                            </div>
+                            <div class="mock-metric">
+                                <div class="mock-m-label">Costs</div>
+                                <div class="mock-m-val neg">$4,598</div>
+                            </div>
+                        </div>
+                        <div class="mock-obj">
+                            <div class="mock-obj-info">
+                                <div class="mock-obj-name">iPhone 14 Pro</div>
+                                <div class="mock-obj-sub">Qty: 3 · Selling: $720</div>
+                            </div>
+                            <div class="mock-obj-badge">+$486.00</div>
+                        </div>
+                        <div class="mock-obj">
+                            <div class="mock-obj-info">
+                                <div class="mock-obj-name">AirPods Pro 2</div>
+                                <div class="mock-obj-sub">Qty: 5 · Selling: $199</div>
+                            </div>
+                            <div class="mock-obj-badge">+$312.50</div>
+                        </div>
+                        <div class="mock-saved-list">
+                            <div class="mock-saved-item">
+                                <div class="mock-saved-chip">Resale</div>
+                                <div class="mock-saved-name">Q4 Electronics batch</div>
+                                <div class="mock-saved-date">12/3/2024</div>
+                            </div>
+                            <div class="mock-saved-item">
+                                <div class="mock-saved-chip" style="background:rgba(255,187,69,.1);color:#ffbb45">Rental
+                                </div>
+                                <div class="mock-saved-name">Apartment #2 · 6mo</div>
+                                <div class="mock-saved-date">11/18/2024</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BENEFITS -->
+    <section class="benefits">
+        <div class="container">
+            <div class="benefits-inner">
+                <div class="benefits-text">
+                    <div class="tag">Why Profit Lab</div>
+                    <h2 class="reveal">Built for speed,<br><em>built for clarity.</em></h2>
+                    <p class="reveal reveal-delay-1" style="margin-top:1rem">
+                        Stop guessing. Every number updates live — margin, commission, net income — so you always know
+                        exactly where you stand.
+                    </p>
+                    <ul class="benefit-list reveal reveal-delay-2">
+                        <li>
+                            <div class="benefit-check"><svg viewBox="0 0 24 24">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg></div>
+                            Fast and accurate calculations — live, as you type
+                        </li>
+                        <li>
+                            <div class="benefit-check"><svg viewBox="0 0 24 24">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg></div>
+                            Organized deals by color-coded category
+                        </li>
+                        <li>
+                            <div class="benefit-check"><svg viewBox="0 0 24 24">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg></div>
+                            Rental income tracking with payback period
+                        </li>
+                        <li>
+                            <div class="benefit-check"><svg viewBox="0 0 24 24">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg></div>
+                            Export and backup your data anytime as JSON
+                        </li>
+                        <li>
+                            <div class="benefit-check"><svg viewBox="0 0 24 24">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg></div>
+                            Clean, distraction-free interface — light & dark modes
+                        </li>
+                    </ul>
+                </div>
+                <div class="benefit-visual reveal reveal-delay-2">
+                    <div class="benefit-card">
+                        <div class="benefit-card-label">Rental ROI · Apartment #1</div>
+                        <div class="benefit-rows">
+                            <div class="benefit-row">
+                                <span class="benefit-row-name">Monthly income</span>
+                                <span class="benefit-row-val">$1,200</span>
+                            </div>
+                            <div class="benefit-row">
+                                <span class="benefit-row-name">Effective income</span>
+                                <span class="benefit-row-val">$1,080</span>
+                            </div>
+                            <div class="benefit-row">
+                                <span class="benefit-row-name">Monthly expenses</span>
+                                <span class="benefit-row-val neg">−$340</span>
+                            </div>
+                            <div class="benefit-row">
+                                <span class="benefit-row-name">Net / month</span>
+                                <span class="benefit-row-val">$740</span>
+                            </div>
+                            <div class="benefit-row">
+                                <span class="benefit-row-name">Payback period</span>
+                                <span class="benefit-row-val">108 mo</span>
+                            </div>
+                        </div>
+                        <div class="benefit-total">
+                            <span class="benefit-total-label">12-month net return</span>
+                            <span class="benefit-total-val">+$8,880</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-eyebrow reveal">Get started</div>
+            <h2 class="reveal reveal-delay-1">Start tracking your<br><em>deals now.</em></h2>
+            <p class="reveal reveal-delay-2">No account. No installation. Open and calculate.</p>
+            <a href="app.html" class="btn-accent reveal reveal-delay-3">
+                Open Calculator
+                <svg viewBox="0 0 24 24">
+                    <polyline points="9 18 15 12 9 6" />
+                </svg>
+            </a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-inner">
+                <span class="footer-brand">Profit <em>Lab</em></span>
+                <span class="footer-note">Free · No signup · Works offline</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Nav shadow on scroll
+        const nav = document.getElementById('nav');
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('scrolled', window.scrollY > 20);
+        }, { passive: true });
+
+        // Scroll reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('visible');
+                    observer.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.12 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
+</body>
+
+</html>
