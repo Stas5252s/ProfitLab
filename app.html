@@ -3517,9 +3517,11 @@
         ════════════════════════════════════════════ */
         async function cloudLoad(retry = 0) {
             if (!_currentUser) return;
+            // Wait for Supabase auth lock to fully settle before any request
+            const delay = retry === 0 ? 2000 : 2000 * (retry + 1);
+            await new Promise(r => setTimeout(r, delay));
+            if (!_currentUser) return; // user may have logged out during wait
             setSyncState('syncing');
-            // Wait for any in-flight auth lock to settle (especially on first load)
-            if (retry === 0) await new Promise(r => setTimeout(r, 800));
             try {
                 const { data, error } = await supa
                     .from('user_data')
@@ -3536,8 +3538,8 @@
                 }
                 setSyncState('synced');
             } catch (e) {
-                if ((e?.message || e?.name || String(e)).includes('AbortError') && retry < 3) {
-                    setTimeout(() => cloudLoad(retry + 1), 1500 * (retry + 1)); return;
+                if ((e?.message || e?.name || String(e)).includes('AbortError') && retry < 4) {
+                    cloudLoad(retry + 1); return;
                 }
                 console.warn('[sync] load failed:', e?.code, e?.message, e?.details);
                 setSyncState('error');
@@ -3586,16 +3588,33 @@
             if (user) {
                 hideAuthWall();
                 updateUserPill(user);
-                await cloudLoad();
-            } else if (!_skipAuth) {
+                // Only sync on explicit sign-in events, not on every session refresh
+                if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+                    await cloudLoad();
+                }
+            } else if (event === 'SIGNED_OUT') {
                 updateUserPill(null);
             }
         });
 
         /* ── Init auth ── */
         async function initAuth() {
-            // Check existing session
-            const { data: { session } } = await supa.auth.getSession();
+            // Wait for any previous page's auth lock to release
+            await new Promise(r => setTimeout(r, 1200));
+
+            let session = null;
+            // Retry getSession up to 5 times if AbortError
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const res = await supa.auth.getSession();
+                    session = res.data?.session;
+                    break;
+                } catch (e) {
+                    if (i === 4) break;
+                    await new Promise(r => setTimeout(r, 800 * (i + 1)));
+                }
+            }
+
             if (session?.user) {
                 _currentUser = session.user;
                 hideAuthWall();
@@ -3603,14 +3622,11 @@
                 await cloudLoad();
                 return;
             }
-            // Check if user chose to skip
             if (localStorage.getItem(SKIP_KEY) === '1') {
                 _skipAuth = true;
                 hideAuthWall();
                 return;
             }
-            // Show auth wall
-            // wall is visible by default in HTML
         }
 
         /* ════════════════════════════════════════════
