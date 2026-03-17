@@ -1174,12 +1174,18 @@
         <div class="container">
             <div class="nav-inner">
                 <span class="nav-brand">Profit <em>Lab</em></span>
-                <a href="app.html" class="nav-cta">
-                    Open Calculator
-                    <svg viewBox="0 0 24 24">
-                        <polyline points="9 18 15 12 9 6" />
-                    </svg>
-                </a>
+                <div style="display:flex;align-items:center;gap:1rem">
+                    <a href="contact.html"
+                        style="font-family:var(--mono);font-size:.72rem;color:var(--muted);letter-spacing:.04em;transition:color .15s"
+                        onmouseover="this.style.color='var(--ink)'"
+                        onmouseout="this.style.color='var(--muted)'">Contact</a>
+                    <a href="app.html" class="nav-cta">
+                        Open Calculator
+                        <svg viewBox="0 0 24 24">
+                            <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
@@ -1529,7 +1535,13 @@
         <div class="container">
             <div class="footer-inner">
                 <span class="footer-brand">Profit <em>Lab</em></span>
-                <span class="footer-note">Free · No signup · Works offline</span>
+                <div style="display:flex;gap:1.5rem;align-items:center">
+                    <a href="contact.html"
+                        style="font-family:var(--mono);font-size:.65rem;color:rgba(245,242,236,.25);letter-spacing:.06em;transition:color .15s"
+                        onmouseover="this.style.color='rgba(245,242,236,.5)'"
+                        onmouseout="this.style.color='rgba(245,242,236,.25)'">Contact</a>
+                    <span class="footer-note">Free · No signup · Works offline</span>
+                </div>
             </div>
         </div>
     </footer>
