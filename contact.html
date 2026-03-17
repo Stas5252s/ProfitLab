@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact — Profit Lab</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,400;0,9..144,700;1,9..144,200;1,9..144,400;1,9..144,700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* ─── TOKENS ─────────────────────────────── */
+        :root {
+            --ink: #0e0d12;
+            --paper: #f5f2ec;
+            --accent: #c8f060;
+            --muted: #6b6570;
+            --border: rgba(14, 13, 18, .1);
+            --border-light: rgba(14, 13, 18, .06);
+            --surface: #ffffff;
+            --surface2: #f0ede6;
+            --mono: 'DM Mono', monospace;
+            --serif: 'Fraunces', Georgia, serif;
+            --ease: cubic-bezier(.4, 0, .2, 1);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px
+        }
+
+        body {
+            font-family: var(--mono);
+            background: var(--paper);
+            color: var(--ink);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none
+        }
+
+        button {
+            cursor: pointer;
+            font-family: var(--mono)
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 0 1.5rem
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            font-size: .65rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: .3rem .85rem;
+            font-family: var(--mono);
+            margin-bottom: 1.5rem;
+        }
+
+        .tag::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            flex-shrink: 0
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity .7s var(--ease), transform .7s var(--ease)
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0)
+        }
+
+        .reveal-delay-1 {
+            transition-delay: .1s
+        }
+
+        .reveal-delay-2 {
+            transition-delay: .2s
+        }
+
+        .reveal-delay-3 {
+            transition-delay: .3s
+        }
+
+        /* ─── NAV ────────────────────────────────── */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            background: rgba(245, 242, 236, .88);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-light);
+            transition: box-shadow .3s;
+        }
+
+        nav.scrolled {
+            box-shadow: 0 4px 24px rgba(14, 13, 18, .08)
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%
+        }
+
+        .nav-brand {
+            font-family: var(--serif);
+            font-weight: 400;
+            font-size: 1.05rem;
+            letter-spacing: -.01em
+        }
+
+        .nav-brand em {
+            font-style: italic;
+            color: var(--accent);
+            filter: brightness(.7)
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem
+        }
+
+        .nav-link {
+            font-size: .72rem;
+            color: var(--muted);
+            letter-spacing: .04em;
+            transition: color .15s
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--ink)
+        }
+
+        .nav-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            background: var(--ink);
+            color: var(--paper);
+            font-family: var(--mono);
+            font-size: .7rem;
+            letter-spacing: .06em;
+            padding: .55rem 1.1rem;
+            border-radius: 6px;
+            border: none;
+            transition: background .18s, transform .15s;
+        }
+
+        .nav-cta:hover {
+            background: #1e1c25;
+            transform: translateY(-1px)
+        }
+
+        .nav-cta svg {
+            width: 12px;
+            height: 12px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+
+        /* ─── PAGE HERO ──────────────────────────── */
+        .page-hero {
+            padding: 140px 0 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-grid-bg {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(var(--border-light) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border-light) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+        }
+
+        .hero-grid-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 70% 60% at 50% 0%, transparent 40%, var(--paper) 100%);
+        }
+
+        .hero-content {
+            position: relative;
+            max-width: 600px
+        }
+
+        .hero-eyebrow {
+            font-size: .65rem;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: var(--muted);
+            font-family: var(--mono);
+            margin-bottom: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: .7rem;
+        }
+
+        .hero-eyebrow::before {
+            content: '';
+            display: inline-block;
+            width: 28px;
+            height: 1px;
+            background: var(--muted)
+        }
+
+        h1 {
+            font-family: var(--serif);
+            font-weight: 200;
+            font-size: clamp(2.6rem, 6vw, 4.2rem);
+            line-height: 1.05;
+            letter-spacing: -.03em;
+            color: var(--ink);
+            margin-bottom: 1.2rem;
+        }
+
+        h1 em {
+            font-style: italic;
+            color: transparent;
+            -webkit-text-stroke: 1.5px var(--ink)
+        }
+
+        .hero-sub {
+            font-size: .92rem;
+            color: var(--muted);
+            max-width: 420px;
+            line-height: 1.75;
+            font-weight: 300
+        }
+
+        /* ─── CONTACT BODY ───────────────────────── */
+        .contact-body {
+            flex: 1;
+            padding: 0 0 100px
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 5rem;
+            align-items: start;
+        }
+
+        /* Info cards */
+        .info-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem
+        }
+
+        .info-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.2rem 1.3rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            transition: border-color .18s, box-shadow .18s;
+        }
+
+        .info-card:hover {
+            border-color: rgba(14, 13, 18, .18);
+            box-shadow: 0 4px 16px rgba(14, 13, 18, .06)
+        }
+
+        .info-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 9px;
+            background: rgba(200, 240, 96, .12);
+            border: 1px solid rgba(200, 240, 96, .28);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .info-icon svg {
+            width: 15px;
+            height: 15px;
+            fill: none;
+            stroke: #3a7200;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+
+        .info-title {
+            font-size: .8rem;
+            font-weight: 500;
+            color: var(--ink);
+            margin-bottom: .25rem
+        }
+
+        .info-desc {
+            font-size: .72rem;
+            color: var(--muted);
+            line-height: 1.6;
+            font-weight: 300
+        }
+
+        /* Form */
+        .form-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2.2rem;
+            box-shadow: 0 8px 40px rgba(14, 13, 18, .06);
+        }
+
+        .form-card-title {
+            font-family: var(--serif);
+            font-weight: 400;
+            font-size: 1.1rem;
+            letter-spacing: -.01em;
+            color: var(--ink);
+            margin-bottom: 1.8rem;
+        }
+
+        .form-card-title em {
+            font-style: italic
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: .85rem
+        }
+
+        .form-field {
+            margin-bottom: 1rem
+        }
+
+        .form-field label {
+            display: block;
+            font-size: .62rem;
+            letter-spacing: .09em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: .4rem;
+        }
+
+        .form-field input,
+        .form-field textarea,
+        .form-field select {
+            width: 100%;
+            font-family: var(--mono);
+            font-size: .82rem;
+            color: var(--ink);
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: .72rem .9rem;
+            outline: none;
+            transition: border-color .15s, box-shadow .15s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .form-field input::placeholder,
+        .form-field textarea::placeholder {
+            color: rgba(14, 13, 18, .28)
+        }
+
+        .form-field input:focus,
+        .form-field textarea:focus,
+        .form-field select:focus {
+            border-color: rgba(200, 240, 96, .5);
+            box-shadow: 0 0 0 3px rgba(200, 240, 96, .1);
+        }
+
+        .form-field textarea {
+            resize: vertical;
+            min-height: 120px;
+            line-height: 1.6
+        }
+
+        .form-field select {
+            cursor: pointer
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: .6rem;
+            background: var(--ink);
+            color: var(--paper);
+            font-family: var(--mono);
+            font-size: .78rem;
+            letter-spacing: .05em;
+            padding: .85rem 1.8rem;
+            border-radius: 8px;
+            border: none;
+            width: 100%;
+            transition: background .18s, transform .15s, box-shadow .18s;
+            box-shadow: 0 4px 20px rgba(14, 13, 18, .18);
+            margin-top: .4rem;
+        }
+
+        .btn-primary:hover {
+            background: #1e1c25;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(14, 13, 18, .22)
+        }
+
+        .btn-primary:active {
+            transform: translateY(0)
+        }
+
+        .btn-primary:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none
+        }
+
+        .btn-primary svg {
+            width: 14px;
+            height: 14px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+
+        .success-state {
+            display: none;
+            text-align: center;
+            padding: 2.5rem 1rem
+        }
+
+        .success-state.show {
+            display: block
+        }
+
+        .success-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: rgba(200, 240, 96, .15);
+            border: 1px solid rgba(200, 240, 96, .3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.2rem;
+        }
+
+        .success-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: #3a7200;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round
+        }
+
+        .success-title {
+            font-family: var(--serif);
+            font-weight: 400;
+            font-size: 1.3rem;
+            letter-spacing: -.01em;
+            margin-bottom: .5rem
+        }
+
+        .success-sub {
+            font-size: .82rem;
+            color: var(--muted);
+            font-weight: 300;
+            line-height: 1.6
+        }
+
+        /* ─── FOOTER ─────────────────────────────── */
+        footer {
+            background: var(--ink);
+            border-top: 1px solid rgba(255, 255, 255, .06);
+            padding: 2rem 0
+        }
+
+        .footer-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem
+        }
+
+        .footer-brand {
+            font-family: var(--serif);
+            font-weight: 300;
+            font-size: .9rem;
+            color: rgba(245, 242, 236, .4)
+        }
+
+        .footer-brand em {
+            font-style: italic;
+            color: rgba(200, 240, 96, .6)
+        }
+
+        .footer-right {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center
+        }
+
+        .footer-link {
+            font-size: .65rem;
+            color: rgba(245, 242, 236, .25);
+            letter-spacing: .06em;
+            transition: color .15s
+        }
+
+        .footer-link:hover {
+            color: rgba(245, 242, 236, .5)
+        }
+
+        .footer-note {
+            font-size: .65rem;
+            color: rgba(245, 242, 236, .2);
+            letter-spacing: .04em
+        }
+
+        /* ─── RESPONSIVE ─────────────────────────── */
+        @media(max-width:768px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: 2.5rem
+            }
+
+            .form-row {
+                grid-template-columns: 1fr
+            }
+
+            .page-hero {
+                padding: 110px 0 60px
+            }
+
+            h1 {
+                font-size: clamp(2rem, 9vw, 3rem)
+            }
+        }
+
+        @media(max-width:480px) {
+            .form-card {
+                padding: 1.4rem
+            }
+
+            .nav-link {
+                display: none
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <nav id="nav">
+        <div class="container">
+            <div class="nav-inner">
+                <a href="index.html" class="nav-brand">Profit <em>Lab</em></a>
+                <div class="nav-right">
+                    <a href="contact.html" class="nav-link active">Contact</a>
+                    <a href="app.html" class="nav-cta">
+                        Open Calculator
+                        <svg viewBox="0 0 24 24">
+                            <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="page-hero">
+        <div class="hero-grid-bg"></div>
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-eyebrow reveal">Get in touch</div>
+                <h1 class="reveal reveal-delay-1">We'd love to<br>hear from <em>you.</em></h1>
+                <p class="hero-sub reveal reveal-delay-2">Bug report, feature idea, or just want to say hi — drop us a
+                    message and we'll reply within 24 hours.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="contact-body">
+        <div class="container">
+            <div class="contact-grid">
+
+                <div class="contact-info reveal">
+                    <div class="tag">Support</div>
+                    <div class="info-stack">
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                    <polyline points="22,6 12,13 2,6" />
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="info-title">Fast replies</div>
+                                <div class="info-desc">We reply to every message within 24 hours on business days.</div>
+                            </div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="info-title">Feature requests</div>
+                                <div class="info-desc">Have an idea? We read every suggestion and build the best ones.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <line x1="12" y1="8" x2="12" y2="12" />
+                                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="info-title">Bug reports</div>
+                                <div class="info-desc">Found something broken? Tell us and we'll fix it fast.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-card reveal reveal-delay-1">
+                    <div class="form-card-title">Send us a <em>message</em></div>
+                    <form id="contactForm" action="https://formspree.io/f/xnjgoqao" method="POST">
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label>First name</label>
+                                <input type="text" name="first_name" placeholder="John" required>
+                            </div>
+                            <div class="form-field">
+                                <label>Last name</label>
+                                <input type="text" name="last_name" placeholder="Doe">
+                            </div>
+                        </div>
+                        <div class="form-field">
+                            <label>Email</label>
+                            <input type="email" name="email" placeholder="you@example.com" required>
+                        </div>
+                        <div class="form-field">
+                            <label>Topic</label>
+                            <select name="topic">
+                                <option value="bug">Bug report</option>
+                                <option value="feature">Feature request</option>
+                                <option value="question">Question</option>
+                                <option value="billing">Billing</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label>Message</label>
+                            <textarea name="message" placeholder="Tell us what's on your mind…" required></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary" id="submitBtn">
+                            Send message
+                            <svg viewBox="0 0 24 24">
+                                <line x1="22" y1="2" x2="11" y2="13" />
+                                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                            </svg>
+                        </button>
+                    </form>
+                    <div class="success-state" id="successState">
+                        <div class="success-icon">
+                            <svg viewBox="0 0 24 24">
+                                <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                        </div>
+                        <div class="success-title">Message sent!</div>
+                        <div class="success-sub">Thanks for reaching out.<br>We'll get back to you within 24 hours.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-inner">
+                <span class="footer-brand">Profit <em>Lab</em></span>
+                <div class="footer-right">
+                    <a href="contact.html" class="footer-link">Contact</a>
+                    <span class="footer-note">© 2025 Profit Lab</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const nav = document.getElementById('nav');
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('scrolled', window.scrollY > 20);
+        }, { passive: true });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target) }
+            });
+        }, { threshold: 0.12 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        const form = document.getElementById('contactForm');
+        const btn = document.getElementById('submitBtn');
+        const success = document.getElementById('successState');
+
+        form.addEventListener('submit', async e => {
+            e.preventDefault();
+            btn.disabled = true;
+            btn.textContent = 'Sending…';
+            try {
+                const res = await fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (res.ok) {
+                    form.style.display = 'none';
+                    success.classList.add('show');
+                } else { throw new Error() }
+            } catch {
+                btn.disabled = false;
+                btn.innerHTML = 'Send message <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+                alert('Something went wrong. Please try again.');
+            }
+        });
+    </script>
+</body>
+
+</html>
