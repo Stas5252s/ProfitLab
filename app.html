@@ -3366,7 +3366,14 @@
         ════════════════════════════════════════════ */
         const SUPA_URL = 'https://chsdnjvvcfmkhvcicfbq.supabase.co';
         const SUPA_KEY = 'sb_publishable_CZ9DCaLEskJ4uenatAoGTg_jbt2bvn1';
-        const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+        const supa = supabase.createClient(SUPA_URL, SUPA_KEY, {
+            auth: {
+                persistSession: true,
+                detectSessionInUrl: true,
+                flowType: 'implicit',
+                lock: async (name, acquireTimeout, fn) => fn(),
+            }
+        });
         window._supa = supa; window._ST = ST;
 
         let _currentUser = null;
