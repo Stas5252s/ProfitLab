@@ -1984,6 +1984,188 @@
                 opacity: .4
             }
         }
+
+        /* ─── PLANS ──────────────────────────────── */
+        .sf-btn-plans {
+            border-color: var(--a-b);
+            color: var(--accent);
+            background: var(--a-d)
+        }
+
+        .sf-btn-plans:hover {
+            background: var(--accent);
+            color: #0d0d0f;
+            border-color: var(--accent)
+        }
+
+        .plans-sheet {
+            max-width: 720px;
+            width: 100%
+        }
+
+        .plans-demo-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            letter-spacing: .05em;
+            color: var(--amber);
+            background: var(--am-d);
+            border: 1px solid rgba(255, 187, 69, .25);
+            border-radius: 20px;
+            padding: 4px 10px;
+            margin-bottom: 1rem;
+        }
+
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: .75rem;
+            margin-top: .5rem;
+        }
+
+        .plan-card {
+            background: var(--surface2);
+            border: 1px solid var(--b0);
+            border-radius: var(--rad);
+            padding: 1.2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: .6rem;
+            position: relative;
+            transition: border-color .18s;
+        }
+
+        .plan-card:hover {
+            border-color: var(--b1)
+        }
+
+        .plan-card-featured {
+            background: var(--a-d);
+            border-color: var(--a-b);
+        }
+
+        .plan-badge {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 9px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            background: var(--accent);
+            color: #0d0d0f;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .plan-name {
+            font-family: var(--serif);
+            font-weight: 300;
+            font-size: 1rem;
+            color: var(--text);
+            letter-spacing: -.01em;
+            margin-top: .4rem;
+        }
+
+        .plan-price {
+            font-family: var(--serif);
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--text);
+            letter-spacing: -.03em;
+            line-height: 1;
+        }
+
+        .plan-price span {
+            font-family: var(--mono);
+            font-size: .7rem;
+            font-weight: 400;
+            color: var(--text2)
+        }
+
+        .plan-features {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: .45rem;
+            font-size: 11px;
+            color: var(--text2);
+            flex: 1;
+            margin: .3rem 0;
+        }
+
+        .plan-features li {
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            line-height: 1.4
+        }
+
+        .plan-btn {
+            width: 100%;
+            height: 36px;
+            border-radius: var(--rad-s);
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: .04em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: all .15s;
+            border: 1px solid transparent;
+            margin-top: .3rem;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .plan-btn-ghost {
+            background: none;
+            border-color: var(--b0);
+            color: var(--text2)
+        }
+
+        .plan-btn-ghost:hover {
+            border-color: var(--b1);
+            color: var(--text)
+        }
+
+        .plan-btn-accent {
+            background: var(--accent);
+            color: #0d0d0f;
+            border-color: var(--accent);
+            font-weight: 500
+        }
+
+        .plan-btn-accent:hover {
+            background: #d4f570;
+            transform: translateY(-1px)
+        }
+
+        .plan-btn-outline {
+            background: none;
+            border-color: var(--b1);
+            color: var(--text)
+        }
+
+        .plan-btn-outline:hover {
+            background: var(--surface3);
+            border-color: var(--b2)
+        }
+
+        @media(max-width:560px) {
+            .plans-grid {
+                grid-template-columns: 1fr
+            }
+
+            .plans-sheet {
+                max-height: 90vh;
+                overflow-y: auto
+            }
+        }
     </style>
 </head>
 
@@ -2093,6 +2275,13 @@
         </symbol>
         <symbol id="ic-chart" viewBox="0 0 24 24">
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+        </symbol>
+        <symbol id="ic-zap" viewBox="0 0 24 24">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+        </symbol>
+        <symbol id="ic-crown" viewBox="0 0 24 24">
+            <path d="M2 20h20M5 20V10l7-7 7 7v10" />
+            <polyline points="9 20 9 14 12 14 15 14 15 20" />
         </symbol>
         <symbol id="ic-globe" viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="10" />
@@ -2280,6 +2469,12 @@
                         <use href="#ic-download" />
                     </svg>
                     <span class="sf-label" data-i="export_btn"></span>
+                </button>
+                <button class="sf-btn sf-btn-plans" onclick="openPlansModal()">
+                    <svg class="ico ico-sm">
+                        <use href="#ic-zap" />
+                    </svg>
+                    <span class="sf-label">Plans</span>
                 </button>
                 <div class="lang-wrap" id="langWrap">
                     <button class="sf-btn" id="langBtn" onclick="toggleLangMenu(event)">
@@ -3637,6 +3832,53 @@
         }
 
         /* ════════════════════════════════════════════
+           PLANS / STRIPE DEMO
+        ════════════════════════════════════════════ */
+        // Stripe test publishable key — safe to expose (test mode only)
+        const STRIPE_TEST_KEY = 'pk_test_51000000000000000000000000'; // replace with your Stripe test key
+
+        // Demo price IDs — replace with your actual Stripe test price IDs
+        const PLAN_PRICES = {
+            premium: 'price_test_premium',       // replace after creating product in Stripe
+            premium_plus: 'price_test_premium_plus'
+        };
+
+        function openPlansModal() {
+            openModal('plansModal');
+        }
+
+        async function startCheckout(plan) {
+            // Show loading state on button
+            const btn = event.target.closest('button');
+            const orig = btn.innerHTML;
+            btn.disabled = true;
+            btn.textContent = 'Opening Stripe…';
+
+            try {
+                // In demo mode, just redirect to Stripe test payment link
+                // Replace these URLs with your actual Stripe test payment links
+                const links = {
+                    premium: 'https://buy.stripe.com/test_demo_premium',
+                    premium_plus: 'https://buy.stripe.com/test_demo_premium_plus'
+                };
+
+                // Since this is a demo, show a toast explaining what would happen
+                closeModal('plansModal');
+                toast('Demo: In production this would open Stripe checkout');
+
+                // Uncomment below and add real links when ready for production:
+                // window.location.href = links[plan];
+
+            } catch (e) {
+                console.warn('Checkout error:', e);
+                toast('Something went wrong');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = orig;
+            }
+        }
+
+        /* ════════════════════════════════════════════
            MODALS
         ════════════════════════════════════════════ */
         function openModal(id) { document.getElementById(id).classList.remove('hidden') }
@@ -3675,6 +3917,104 @@
         setTimeout(() => checkShareInUrl(), 200);
         initAuth();
     </script>
+
+
+    <!-- PLANS MODAL -->
+    <div class="overlay hidden" id="plansModal">
+        <div class="sheet plans-sheet">
+            <div class="plans-demo-badge">
+                <svg class="ico ico-sm" style="color:var(--amber)">
+                    <use href="#ic-zap" />
+                </svg>
+                Demo feature — no real charges will be made
+            </div>
+            <h3 style="font-family:var(--serif);font-weight:300;font-size:1.2rem;margin-bottom:.3rem">
+                Choose your <em style="font-style:italic;color:var(--accent)">plan</em>
+            </h3>
+            <p style="font-size:11px;color:var(--text2);margin-bottom:1.4rem">This is a demo. Stripe is in test mode —
+                use card <strong style="color:var(--text)">4242 4242 4242 4242</strong> to simulate payment.</p>
+
+            <div class="plans-grid">
+                <!-- FREE -->
+                <div class="plan-card">
+                    <div class="plan-name">Free</div>
+                    <div class="plan-price">$0<span>/mo</span></div>
+                    <ul class="plan-features">
+                        <li><svg class="ico ico-sm" style="color:var(--accent)">
+                                <use href="#ic-plus" />
+                            </svg>Up to 15 saved calculations</li>
+                        <li><svg class="ico ico-sm" style="color:var(--accent)">
+                                <use href="#ic-plus" />
+                            </svg>All calculators</li>
+                        <li><svg class="ico ico-sm" style="color:var(--accent)">
+                                <use href="#ic-plus" />
+                            </svg>Categories & sharing</li>
+                        <li><svg class="ico ico-sm" style="color:var(--accent)">
+                                <use href="#ic-plus" />
+                            </svg>JSON export</li>
+                    </ul>
+                    <button class="plan-btn plan-btn-ghost" onclick="closeModal('plansModal')">Current plan</button>
+                </div>
+
+                <!-- PREMIUM -->
+                <div class="plan-card plan-card-featured">
+                    <div class="plan-badge">Popular</div>
+                    <div class="plan-name">Premium</div>
+                    <div class="plan-price">$4<span>/mo</span></div>
+                    <ul class="plan-features">
+                        <li><svg class="ico ico-sm" style="color:var(--accent)">
+                                <use href="#ic-plus" />
+                            </svg>Up to 35 saved calculations</li>
+                        <li><svg class="ico ico-sm" style="color:var(--accent)">
+                                <use href="#ic-plus" />
+                            </svg>Everything in Free</li>
+                        <li><svg class="ico ico-sm" style="color:var(--accent)">
+                                <use href="#ic-plus" />
+                            </svg>Priority support</li>
+                        <li><svg class="ico ico-sm" style="color:var(--accent)">
+                                <use href="#ic-plus" />
+                            </svg>Early access to new features</li>
+                    </ul>
+                    <button class="plan-btn plan-btn-accent" onclick="startCheckout('premium')">
+                        <svg class="ico ico-sm">
+                            <use href="#ic-zap" />
+                        </svg>
+                        Upgrade — Demo
+                    </button>
+                </div>
+
+                <!-- PREMIUM+ -->
+                <div class="plan-card">
+                    <div class="plan-name">Premium<span style="color:var(--accent)">+</span></div>
+                    <div class="plan-price">$9<span>/mo</span></div>
+                    <ul class="plan-features">
+                        <li><svg class="ico ico-sm" style="color:var(--accent)">
+                                <use href="#ic-plus" />
+                            </svg>Unlimited saved calculations</li>
+                        <li><svg class="ico ico-sm" style="color:var(--accent)">
+                                <use href="#ic-plus" />
+                            </svg>Everything in Premium</li>
+                        <li><svg class="ico ico-sm" style="color:var(--accent)">
+                                <use href="#ic-plus" />
+                            </svg>Custom categories</li>
+                        <li><svg class="ico ico-sm" style="color:var(--accent)">
+                                <use href="#ic-plus" />
+                            </svg>Analytics dashboard</li>
+                    </ul>
+                    <button class="plan-btn plan-btn-outline" onclick="startCheckout('premium_plus')">
+                        <svg class="ico ico-sm">
+                            <use href="#ic-crown" />
+                        </svg>
+                        Upgrade — Demo
+                    </button>
+                </div>
+            </div>
+
+            <div class="sheet-btns" style="margin-top:1rem">
+                <button class="btn" onclick="closeModal('plansModal')">Close</button>
+            </div>
+        </div>
+    </div>
 
     <!-- PWA INSTALL BANNER -->
     <div class="install-banner" id="installBanner">
