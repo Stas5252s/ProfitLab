@@ -1986,17 +1986,7 @@
         }
 
         /* ─── PLANS ──────────────────────────────── */
-        .sf-btn-plans {
-            border-color: var(--a-b);
-            color: var(--accent);
-            background: var(--a-d)
-        }
-
-        .sf-btn-plans:hover {
-            background: var(--accent);
-            color: #0d0d0f;
-            border-color: var(--accent)
-        }
+        /* sf-btn-plans inherits default sf-btn style */
 
         .plans-sheet {
             max-width: 720px;
@@ -2474,7 +2464,7 @@
                     <svg class="ico ico-sm">
                         <use href="#ic-zap" />
                     </svg>
-                    <span class="sf-label">Plans</span>
+                    <span class="sf-label">Plans (Demo)</span>
                 </button>
                 <div class="lang-wrap" id="langWrap">
                     <button class="sf-btn" id="langBtn" onclick="toggleLangMenu(event)">
@@ -3835,7 +3825,7 @@
            PLANS / STRIPE DEMO
         ════════════════════════════════════════════ */
         // Stripe test publishable key — safe to expose (test mode only)
-        const STRIPE_TEST_KEY = 'pk_test_51000000000000000000000000'; // replace with your Stripe test key
+        const STRIPE_TEST_KEY = 'pk_test_51TBIE8FJegvSJoeYMBfMzZsWriLkxP4SgDKkKsKdEUrF9aQMIXLanT3bZOL6xIx2SwJDbVGybGWjVQkAN51abiZ800ADryYwag';
 
         // Demo price IDs — replace with your actual Stripe test price IDs
         const PLAN_PRICES = {
