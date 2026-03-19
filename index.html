@@ -170,10 +170,12 @@
             color: var(--paper);
             font-family: var(--mono);
             font-size: .7rem;
-            letter-spacing: .06em;
+            letter-spacing: .04em;
             padding: .55rem 1.1rem;
             border-radius: 6px;
             border: none;
+            white-space: nowrap;
+            flex-shrink: 0;
             transition: background .18s, transform .15s;
         }
 
@@ -1166,6 +1168,21 @@
         }
 
         /* ─── LANG SWITCHER ──────────────────────── */
+        .lang-flag {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 14px;
+            border-radius: 3px;
+            background: var(--border);
+            font-size: .55rem;
+            font-weight: 600;
+            letter-spacing: .04em;
+            color: var(--muted);
+            flex-shrink: 0;
+        }
+
         .lang-switcher {
             position: relative
         }
@@ -1278,9 +1295,12 @@
                             </svg>
                         </button>
                         <div class="lang-dropdown" id="langDropdown">
-                            <button class="lang-option active" onclick="setLandingLang('en')">🌐 English</button>
-                            <button class="lang-option" onclick="setLandingLang('ru')">🌐 Русский</button>
-                            <button class="lang-option" onclick="setLandingLang('uk')">🌐 Українська</button>
+                            <button class="lang-option active" onclick="setLandingLang('en')"><span
+                                    class="lang-flag">EN</span>English</button>
+                            <button class="lang-option" onclick="setLandingLang('ru')"><span
+                                    class="lang-flag">RU</span>Русский</button>
+                            <button class="lang-option" onclick="setLandingLang('uk')"><span
+                                    class="lang-flag">UK</span>Українська</button>
                         </div>
                     </div>
                     <a href="app.html" class="nav-cta">
@@ -1824,10 +1844,9 @@
             set('h1', s.h1);
             set('.hero-sub', s.hero_sub);
             // CTA buttons
-            document.querySelectorAll('a[href="app.html"].btn-primary, a[href="app.html"].btn-accent').forEach(btn => {
-                // keep icon, update text
+            document.querySelectorAll('a[href="app.html"].btn-primary').forEach(btn => {
                 const svg = btn.querySelector('svg');
-                btn.innerHTML = s.start_calc + (btn.classList.contains('btn-accent') ? (s.cta_btn || s.start_calc) : '');
+                btn.innerHTML = '<span>' + s.start_calc + '</span>';
                 if (svg) btn.appendChild(svg);
             });
             setText('.hero-note', s.hero_note);
@@ -1871,13 +1890,13 @@
             // Nav & footer
             document.querySelectorAll('a[href="contact.html"]').forEach(el => el.textContent = s.nav_contact);
             document.querySelectorAll('a[href="app.html"].nav-cta').forEach(btn => {
-                btn.innerHTML = s.nav_open + '<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>';
+                btn.innerHTML = '<span>' + s.nav_open + '</span><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
             });
             set('.footer-note', s.footer_note);
             // CTA button
             document.querySelectorAll('a.btn-accent').forEach(btn => {
                 const svg = btn.querySelector('svg');
-                btn.textContent = s.cta_btn;
+                btn.innerHTML = '<span>' + s.cta_btn + '</span>';
                 if (svg) btn.appendChild(svg);
             });
         }
