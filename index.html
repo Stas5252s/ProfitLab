@@ -1164,6 +1164,97 @@
                 grid-template-columns: 1fr 1fr
             }
         }
+
+        /* ─── LANG SWITCHER ──────────────────────── */
+        .lang-switcher {
+            position: relative
+        }
+
+        .lang-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-family: var(--mono);
+            font-size: .7rem;
+            letter-spacing: .04em;
+            color: var(--muted);
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: .3rem .75rem;
+            cursor: pointer;
+            transition: all .15s;
+        }
+
+        .lang-btn:hover {
+            color: var(--ink);
+            border-color: rgba(14, 13, 18, .2)
+        }
+
+        .lang-btn svg {
+            width: 12px;
+            height: 12px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: transform .15s
+        }
+
+        .lang-btn.open svg {
+            transform: rotate(180deg)
+        }
+
+        .lang-dropdown {
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(14, 13, 18, .1);
+            min-width: 140px;
+            z-index: 200;
+            opacity: 0;
+            transform: translateY(5px);
+            pointer-events: none;
+            transition: opacity .18s var(--ease), transform .18s var(--ease);
+        }
+
+        .lang-dropdown.open {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto
+        }
+
+        .lang-option {
+            width: 100%;
+            padding: 9px 14px;
+            text-align: left;
+            font-family: var(--mono);
+            font-size: .72rem;
+            color: var(--muted);
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: background .12s, color .12s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lang-option:hover {
+            background: var(--surface2);
+            color: var(--ink)
+        }
+
+        .lang-option.active {
+            color: var(--ink);
+            background: var(--surface2);
+            font-weight: 500
+        }
     </style>
 </head>
 
@@ -1179,6 +1270,19 @@
                         style="font-family:var(--mono);font-size:.72rem;color:var(--muted);letter-spacing:.04em;transition:color .15s"
                         onmouseover="this.style.color='var(--ink)'"
                         onmouseout="this.style.color='var(--muted)'">Contact</a>
+                    <div class="lang-switcher" id="langSwitcher">
+                        <button class="lang-btn" id="langToggleBtn" onclick="toggleLangDropdown(event)">
+                            <span id="langCurrent">EN</span>
+                            <svg viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9" />
+                            </svg>
+                        </button>
+                        <div class="lang-dropdown" id="langDropdown">
+                            <button class="lang-option active" onclick="setLandingLang('en')">🌐 English</button>
+                            <button class="lang-option" onclick="setLandingLang('ru')">🌐 Русский</button>
+                            <button class="lang-option" onclick="setLandingLang('uk')">🌐 Українська</button>
+                        </div>
+                    </div>
                     <a href="app.html" class="nav-cta">
                         Open Calculator
                         <svg viewBox="0 0 24 24">
@@ -1564,6 +1668,222 @@
         }, { threshold: 0.12 });
 
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // ─── LANGUAGE SWITCHER ───────────────────
+        const LANDING_STRINGS = {
+            en: {
+                eyebrow: 'Resell & Rental Calculator',
+                h1: 'Know your <span class="accent-word">profit</span><br><em>before</em> you move.',
+                hero_sub: 'Calculate resell profit, rental income, organize deals by categories, and export your data — all in one place.',
+                start_calc: 'Start Calculating',
+                hero_note: 'Free · No signup required',
+                problem_label: 'The problem',
+                problem_h2: 'Most resellers <em>guess</em> their profit.',
+                problem_p: "Spreadsheets break. Mental math is slow. Rental ROI requires formulas nobody remembers. You end up making decisions on incomplete numbers — and leaving money on the table.",
+                pain1: 'Manual calculations — slow, error-prone, and forgotten by tomorrow',
+                pain2: "No deal history — you can't compare what worked and what didn't",
+                pain3: "Rental income ROI requires formulas most people don't have memorized",
+                pain4: 'No categories or structure — every deal lives in a different place',
+                feat_label: 'Features',
+                feat_h2: 'Everything you need,<br><em>nothing you don\'t.</em>',
+                feat1_title: 'Profit Calculator', feat1_desc: 'Instantly calculate profit from reselling items — purchase price, delivery, commission, quantity. See margin and total in real time.',
+                feat2_title: 'Deal Tracking & Categories', feat2_desc: 'Save and organize your deals by color-coded categories. Filter, rename, and recall any calculation — your deal history, always at hand.',
+                feat3_title: 'Rent ROI Calculator', feat3_desc: 'Analyze rental income, factor in vacancy and expenses, and calculate monthly net and full-period ROI — automatically, with payback period included.',
+                feat4_title: 'Data Export', feat4_desc: 'Export all your calculations as JSON — easy backup, spreadsheet import, or analysis. Your data stays yours, always portable.',
+                prev_label: 'Product preview',
+                prev_h2: 'A calculator that <em>thinks</em><br>like a reseller.',
+                ben_label: 'Why Profit Lab',
+                ben_h2: 'Built for speed,<br><em>built for clarity.</em>',
+                ben_p: 'Stop guessing. Every number updates live — margin, commission, net income — so you always know exactly where you stand.',
+                ben1: 'Fast and accurate calculations — live, as you type',
+                ben2: 'Organized deals by color-coded category',
+                ben3: 'Rental income tracking with payback period',
+                ben4: 'Export and backup your data anytime as JSON',
+                ben5: 'Clean, distraction-free interface — light & dark modes',
+                cta_eyebrow: 'Get started',
+                cta_h2: 'Start tracking your<br><em>deals now.</em>',
+                cta_p: 'No account. No installation. Open and calculate.',
+                cta_btn: 'Open Calculator',
+                nav_contact: 'Contact', nav_open: 'Open Calculator',
+                footer_note: 'Free · No signup · Works offline',
+            },
+            ru: {
+                eyebrow: 'Калькулятор перепродажи и аренды',
+                h1: 'Знай свою <span class="accent-word">прибыль</span><br><em>до</em> сделки.',
+                hero_sub: 'Считай прибыль с перепродажи, доход от аренды, организуй сделки по категориям и экспортируй данные — всё в одном месте.',
+                start_calc: 'Начать расчёт',
+                hero_note: 'Бесплатно · Без регистрации',
+                problem_label: 'Проблема',
+                problem_h2: 'Большинство перекупов <em>угадывают</em> прибыль.',
+                problem_p: 'Таблицы ломаются. Устный счёт медленный. ROI аренды требует формул, которые никто не помнит. Ты принимаешь решения на неполных данных — и теряешь деньги.',
+                pain1: 'Ручные расчёты — медленно, с ошибками, и забываются на следующий день',
+                pain2: 'Нет истории сделок — невозможно сравнить, что сработало, а что нет',
+                pain3: 'ROI аренды требует формул, которые большинство не помнит наизусть',
+                pain4: 'Нет категорий и структуры — каждая сделка хранится в разных местах',
+                feat_label: 'Возможности',
+                feat_h2: 'Всё что нужно,<br><em>ничего лишнего.</em>',
+                feat1_title: 'Калькулятор прибыли', feat1_desc: 'Мгновенно считай прибыль от перепродажи — цена покупки, доставка, комиссия, количество. Маржа и итог в реальном времени.',
+                feat2_title: 'Учёт сделок и категории', feat2_desc: 'Сохраняй и организуй сделки по цветным категориям. Фильтруй, переименовывай и открывай любой расчёт — история всегда под рукой.',
+                feat3_title: 'Калькулятор ROI аренды', feat3_desc: 'Анализируй доход от аренды, учитывай простой и расходы, считай чистый доход за месяц и ROI за период — автоматически, со сроком окупаемости.',
+                feat4_title: 'Экспорт данных', feat4_desc: 'Экспортируй все расчёты в JSON — удобный бэкап, импорт в таблицы или аналитика. Твои данные всегда при тебе.',
+                prev_label: 'Превью продукта',
+                prev_h2: 'Калькулятор, который <em>думает</em><br>как перекупщик.',
+                ben_label: 'Почему Profit Lab',
+                ben_h2: 'Быстро<br>и <em>понятно.</em>',
+                ben_p: 'Хватит угадывать. Каждое число обновляется в реальном времени — маржа, комиссия, чистый доход — ты всегда точно знаешь где стоишь.',
+                ben1: 'Быстрые и точные расчёты — в реальном времени',
+                ben2: 'Сделки организованы по цветным категориям',
+                ben3: 'Учёт дохода от аренды со сроком окупаемости',
+                ben4: 'Экспорт и бэкап данных в любой момент',
+                ben5: 'Чистый интерфейс без лишнего — светлая и тёмная тема',
+                cta_eyebrow: 'Начать',
+                cta_h2: 'Начни отслеживать<br><em>сделки сейчас.</em>',
+                cta_p: 'Без аккаунта. Без установки. Открой и считай.',
+                cta_btn: 'Открыть калькулятор',
+                nav_contact: 'Контакты', nav_open: 'Открыть калькулятор',
+                footer_note: 'Бесплатно · Без регистрации · Работает офлайн',
+            },
+            uk: {
+                eyebrow: 'Калькулятор перепродажу та оренди',
+                h1: 'Знай свій <span class="accent-word">прибуток</span><br><em>до</em> угоди.',
+                hero_sub: "Рахуй прибуток з перепродажу, дохід від оренди, організовуй угоди за категоріями та експортуй дані — все в одному місці.",
+                start_calc: 'Почати розрахунок',
+                hero_note: 'Безкоштовно · Без реєстрації',
+                problem_label: 'Проблема',
+                problem_h2: 'Більшість перекупів <em>вгадують</em> прибуток.',
+                problem_p: "Таблиці ламаються. Усний рахунок повільний. ROI оренди потребує формул, які ніхто не пам'ятає. Ти приймаєш рішення на неповних даних — і втрачаєш гроші.",
+                pain1: "Ручні розрахунки — повільно, з помилками, і забуваються наступного дня",
+                pain2: "Немає історії угод — неможливо порівняти, що спрацювало, а що ні",
+                pain3: "ROI оренди потребує формул, які більшість не пам'ятає напам'ять",
+                pain4: "Немає категорій і структури — кожна угода зберігається в різних місцях",
+                feat_label: 'Можливості',
+                feat_h2: 'Все що потрібно,<br><em>нічого зайвого.</em>',
+                feat1_title: "Калькулятор прибутку", feat1_desc: "Миттєво рахуй прибуток від перепродажу — ціна купівлі, доставка, комісія, кількість. Маржа та підсумок у реальному часі.",
+                feat2_title: "Облік угод і категорії", feat2_desc: "Зберігай та організовуй угоди за кольоровими категоріями. Фільтруй, перейменовуй і відкривай будь-який розрахунок.",
+                feat3_title: "Калькулятор ROI оренди", feat3_desc: "Аналізуй дохід від оренди, враховуй простій та витрати, рахуй чистий дохід за місяць та ROI за період — автоматично.",
+                feat4_title: "Експорт даних", feat4_desc: "Експортуй всі розрахунки у JSON — зручний бекап, імпорт у таблиці або аналітика. Твої дані завжди з тобою.",
+                prev_label: "Превʼю продукту",
+                prev_h2: "Калькулятор, який <em>думає</em><br>як перекупник.",
+                ben_label: "Чому Profit Lab",
+                ben_h2: "Швидко<br>і <em>зрозуміло.</em>",
+                ben_p: "Годі вгадувати. Кожне число оновлюється в реальному часі — маржа, комісія, чистий дохід — ти завжди точно знаєш де стоїш.",
+                ben1: "Швидкі та точні розрахунки — у реальному часі",
+                ben2: "Угоди організовані за кольоровими категоріями",
+                ben3: "Облік доходу від оренди з терміном окупності",
+                ben4: "Експорт та бекап даних у будь-який момент",
+                ben5: "Чистий інтерфейс без зайвого — світла та темна тема",
+                cta_eyebrow: "Почати",
+                cta_h2: "Почни відстежувати<br><em>угоди зараз.</em>",
+                cta_p: "Без акаунту. Без встановлення. Відкрий і рахуй.",
+                cta_btn: "Відкрити калькулятор",
+                nav_contact: "Контакти", nav_open: "Відкрити калькулятор",
+                footer_note: "Безкоштовно · Без реєстрації · Працює офлайн",
+            }
+        };
+
+        let _landingLang = localStorage.getItem('profitlab_landing_lang') || 'en';
+
+        function toggleLangDropdown(e) {
+            e.stopPropagation();
+            const btn = document.getElementById('langToggleBtn');
+            const dd = document.getElementById('langDropdown');
+            const isOpen = dd.classList.contains('open');
+            btn.classList.toggle('open', !isOpen);
+            dd.classList.toggle('open', !isOpen);
+        }
+        document.addEventListener('click', () => {
+            document.getElementById('langToggleBtn')?.classList.remove('open');
+            document.getElementById('langDropdown')?.classList.remove('open');
+        });
+
+        function setLandingLang(lang) {
+            _landingLang = lang;
+            localStorage.setItem('profitlab_landing_lang', lang);
+            applyLandingLang();
+            // Update active state
+            document.querySelectorAll('.lang-option').forEach((btn, i) => {
+                btn.classList.toggle('active', ['en', 'ru', 'uk'][i] === lang);
+            });
+            // Close dropdown
+            document.getElementById('langToggleBtn')?.classList.remove('open');
+            document.getElementById('langDropdown')?.classList.remove('open');
+        }
+
+        function applyLandingLang() {
+            const s = LANDING_STRINGS[_landingLang] || LANDING_STRINGS.en;
+            const labels = {
+                'en': 'EN', 'ru': 'RU', 'uk': 'UK'
+            };
+            document.getElementById('langCurrent').textContent = labels[_landingLang];
+
+            // Helper
+            const set = (sel, html) => { const el = document.querySelector(sel); if (el) el.innerHTML = html; };
+            const setText = (sel, txt) => { const el = document.querySelector(sel); if (el) el.textContent = txt; };
+
+            set('.hero-eyebrow', s.eyebrow);
+            set('h1', s.h1);
+            set('.hero-sub', s.hero_sub);
+            // CTA buttons
+            document.querySelectorAll('a[href="app.html"].btn-primary, a[href="app.html"].btn-accent').forEach(btn => {
+                // keep icon, update text
+                const svg = btn.querySelector('svg');
+                btn.innerHTML = s.start_calc + (btn.classList.contains('btn-accent') ? (s.cta_btn || s.start_calc) : '');
+                if (svg) btn.appendChild(svg);
+            });
+            setText('.hero-note', s.hero_note);
+            set('.problem-label', s.problem_label);
+            set('.problem-text h2', s.problem_h2);
+            set('.problem-text p', s.problem_p);
+            // Pain items
+            const pains = document.querySelectorAll('.pain-list li');
+            [s.pain1, s.pain2, s.pain3, s.pain4].forEach((txt, i) => {
+                if (pains[i]) {
+                    const icon = pains[i].querySelector('.pain-icon');
+                    pains[i].innerHTML = '';
+                    if (icon) pains[i].appendChild(icon);
+                    pains[i].appendChild(document.createTextNode(' ' + txt));
+                }
+            });
+            set('.section-header .reveal', s.feat_h2);
+            // Feature cards
+            const fcards = document.querySelectorAll('.feature-card');
+            const fkeys = [['feat1_title', 'feat1_desc'], ['feat2_title', 'feat2_desc'], ['feat3_title', 'feat3_desc'], ['feat4_title', 'feat4_desc']];
+            fcards.forEach((card, i) => {
+                const h3 = card.querySelector('h3'); const p = card.querySelector('p');
+                if (h3) h3.textContent = s[fkeys[i][0]];
+                if (p) p.textContent = s[fkeys[i][1]];
+            });
+            set('.preview-label', s.prev_label);
+            set('.preview-headline', s.prev_h2);
+            // Benefits
+            const bens = document.querySelectorAll('.benefit-list li');
+            [s.ben1, s.ben2, s.ben3, s.ben4, s.ben5].forEach((txt, i) => {
+                if (bens[i]) {
+                    const check = bens[i].querySelector('.benefit-check');
+                    bens[i].innerHTML = '';
+                    if (check) bens[i].appendChild(check);
+                    bens[i].appendChild(document.createTextNode(' ' + txt));
+                }
+            });
+            set('.cta-eyebrow', s.cta_eyebrow);
+            set('.cta h2', s.cta_h2);
+            set('.cta p', s.cta_p);
+            // Nav & footer
+            document.querySelectorAll('a[href="contact.html"]').forEach(el => el.textContent = s.nav_contact);
+            document.querySelectorAll('a[href="app.html"].nav-cta').forEach(btn => {
+                btn.innerHTML = s.nav_open + '<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>';
+            });
+            set('.footer-note', s.footer_note);
+            // CTA button
+            document.querySelectorAll('a.btn-accent').forEach(btn => {
+                const svg = btn.querySelector('svg');
+                btn.textContent = s.cta_btn;
+                if (svg) btn.appendChild(svg);
+            });
+        }
+
+        // Apply on load
+        applyLandingLang();
     </script>
 </body>
 
