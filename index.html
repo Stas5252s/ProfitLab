@@ -1905,15 +1905,15 @@
             });
 
             // Hero stats
-            const setText = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
-            setText('stat-calc', s.stat_calc);
-            setText('stat-deals', s.stat_deals);
-            setText('stat-langs', s.stat_langs);
-            setText('stat-cost', s.stat_cost);
+            const setT = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+            setT('stat-calc', s.stat_calc);
+            setT('stat-deals', s.stat_deals);
+            setT('stat-langs', s.stat_langs);
+            setT('stat-cost', s.stat_cost);
 
             // Tags
-            setText('tag-features', s.tag_features);
-            setText('tag-benefits', s.tag_benefits);
+            setT('tag-features', s.tag_features);
+            setT('tag-benefits', s.tag_benefits);
 
             // Benefits h2 and p
             const benH2 = document.getElementById('ben-h2');
