@@ -1340,19 +1340,19 @@
                 <div class="hero-stat-row reveal reveal-delay-4">
                     <div class="hero-stat">
                         <div class="hero-stat-num">2<em>×</em></div>
-                        <div class="hero-stat-label">Calculators</div>
+                        <div class="hero-stat-label" id="stat-calc">Calculators</div>
                     </div>
                     <div class="hero-stat">
                         <div class="hero-stat-num">∞</div>
-                        <div class="hero-stat-label">Saved deals</div>
+                        <div class="hero-stat-label" id="stat-deals">Saved deals</div>
                     </div>
                     <div class="hero-stat">
                         <div class="hero-stat-num">3</div>
-                        <div class="hero-stat-label">Languages</div>
+                        <div class="hero-stat-label" id="stat-langs">Languages</div>
                     </div>
                     <div class="hero-stat">
                         <div class="hero-stat-num">0<em>$</em></div>
-                        <div class="hero-stat-label">Cost</div>
+                        <div class="hero-stat-label" id="stat-cost">Cost</div>
                     </div>
                 </div>
             </div>
@@ -1410,7 +1410,7 @@
     <section class="features">
         <div class="container">
             <div class="section-header">
-                <div class="tag">Features</div>
+                <div class="tag" id="tag-features">Features</div>
                 <h2 class="reveal" style="color:var(--ink);font-size:clamp(1.8rem,4vw,2.6rem)">
                     Everything you need,<br><em>nothing you don't.</em>
                 </h2>
@@ -1565,12 +1565,10 @@
         <div class="container">
             <div class="benefits-inner">
                 <div class="benefits-text">
-                    <div class="tag">Why Profit Lab</div>
-                    <h2 class="reveal">Built for speed,<br><em>built for clarity.</em></h2>
-                    <p class="reveal reveal-delay-1" style="margin-top:1rem">
-                        Stop guessing. Every number updates live — margin, commission, net income — so you always know
-                        exactly where you stand.
-                    </p>
+                    <div class="tag" id="tag-benefits">Why Profit Lab</div>
+                    <h2 class="reveal" id="ben-h2">Built for speed,<br><em>built for clarity.</em></h2>
+                    <p class="reveal reveal-delay-1" id="ben-p" style="margin-top:1rem">Stop guessing. Every number
+                        updates live — margin, commission, net income — so you always know exactly where you stand.</p>
                     <ul class="benefit-list reveal reveal-delay-2">
                         <li>
                             <div class="benefit-check"><svg viewBox="0 0 24 24">
@@ -1725,6 +1723,8 @@
                 cta_p: 'No account. No installation. Open and calculate.',
                 cta_btn: 'Open Calculator',
                 nav_contact: 'Contact', nav_open: 'Open Calculator',
+                stat_calc: 'Calculators', stat_deals: 'Saved deals', stat_langs: 'Languages', stat_cost: 'Cost',
+                tag_features: 'Features', tag_benefits: 'Why Profit Lab',
                 footer_note: 'Free · No signup · Works offline',
             },
             ru: {
@@ -1761,6 +1761,8 @@
                 cta_p: 'Без аккаунта. Без установки. Открой и считай.',
                 cta_btn: 'Открыть калькулятор',
                 nav_contact: 'Контакты', nav_open: 'Открыть калькулятор',
+                stat_calc: 'Калькуляторы', stat_deals: 'Сделки', stat_langs: 'Языки', stat_cost: 'Цена',
+                tag_features: 'Возможности', tag_benefits: 'Почему Profit Lab',
                 footer_note: 'Бесплатно · Без регистрации · Работает офлайн',
             },
             uk: {
@@ -1797,6 +1799,8 @@
                 cta_p: "Без акаунту. Без встановлення. Відкрий і рахуй.",
                 cta_btn: "Відкрити калькулятор",
                 nav_contact: "Контакти", nav_open: "Відкрити калькулятор",
+                stat_calc: 'Калькулятори', stat_deals: 'Угоди', stat_langs: 'Мови', stat_cost: 'Ціна',
+                tag_features: 'Можливості', tag_benefits: 'Чому Profit Lab',
                 footer_note: "Безкоштовно · Без реєстрації · Працює офлайн",
             }
         };
@@ -1899,6 +1903,27 @@
                 btn.innerHTML = '<span>' + s.cta_btn + '</span>';
                 if (svg) btn.appendChild(svg);
             });
+
+            // Hero stats
+            const setText = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+            setText('stat-calc', s.stat_calc);
+            setText('stat-deals', s.stat_deals);
+            setText('stat-langs', s.stat_langs);
+            setText('stat-cost', s.stat_cost);
+
+            // Tags
+            setText('tag-features', s.tag_features);
+            setText('tag-benefits', s.tag_benefits);
+
+            // Benefits h2 and p
+            const benH2 = document.getElementById('ben-h2');
+            if (benH2) benH2.innerHTML = s.ben_h2;
+            const benP = document.getElementById('ben-p');
+            if (benP) benP.innerHTML = s.ben_p;
+
+            // Section header h2 (features)
+            const featH2 = document.querySelector('.section-header h2');
+            if (featH2) featH2.innerHTML = s.feat_h2;
         }
 
         // Apply on load
